@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Repositories\CategoryRepoInterface;
-use Illuminate\Http\Request;
 
 class CateService
 {

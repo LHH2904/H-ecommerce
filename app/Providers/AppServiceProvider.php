@@ -9,8 +9,11 @@ use App\Repositories\CategoryRepoInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\SliderRepoInterface;
 use App\Repositories\SliderRepository;
+use App\Repositories\SubCategoryRepository;
+use App\Repositories\SubCateRepoInterface;
 use App\Services\CateService;
 use App\Services\SliderService;
+use App\Services\SubCateService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +32,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CategoryRepoInterface::class, CategoryRepository::class);
         $this->app->bind(CateService::class, function ($app) {
             return new CateService($app->make(CategoryRepoInterface::class));
+        });
+
+        // SubCate Service
+        $this->app->bind(SubCateRepoInterface::class, SubCategoryRepository::class);
+        $this->app->bind(SubCateService::class, function ($app) {
+            return new SubCateService($app->make(SubCateRepoInterface::class));
         });
     }
 

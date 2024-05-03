@@ -3,16 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\Category;
-use App\Models\Slider;
 use App\Repositories\CategoryRepoInterface;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class CategoryRepository implements CategoryRepoInterface
 {
     public function getAllCategories()
     {
-        // return Category::where('status', 1)->orderBy('serial', 'asc')->get();
+        return Category::all();
     }
 
     public function getCateById($id)
