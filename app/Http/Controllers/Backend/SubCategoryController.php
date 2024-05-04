@@ -27,7 +27,6 @@ class SubCategoryController extends Controller
     public function create()
     {
         $categories = $this->cateService->all();
-        // dd($categories);
         return view('admin.sub-category.create', compact('categories'));
     }
 
