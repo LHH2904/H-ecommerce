@@ -37,8 +37,8 @@ class SubCateService
         return $this->subCateRepo->deleteSubCategory($id);
     }
 
-    // public function changeStatus(array $data)
-    // {
-    //     return $this->cateRepository->changStatus($data);
-    // }
+    public function changeStatus(array $data)
+    {
+        return $this->subCateRepo->changStatus($data);
+    }
 }

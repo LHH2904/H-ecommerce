@@ -33,7 +33,7 @@ class SubCategoryRepository implements SubCateRepoInterface
     {
         $subcategory = $this->getSubCateById($id);
 
-        $subcategory->category_id = $data['category_id'];
+        $subcategory->category_id = $data['category'];
         $subcategory->name = $data['name'];
         $subcategory->slug = Str::slug($data['name']);
         $subcategory->status = $data['status'];
@@ -44,5 +44,12 @@ class SubCategoryRepository implements SubCateRepoInterface
     {
         $subcategory = SubCategory::findOrFail($id);
         $subcategory->delete();
+    }
+
+    public function changStatus($data)
+    {
+        $subcategory = SubCategory::findOrFail($data['id']);
+        $subcategory->status = $data['status'] == 'true' ? 1 : 0;
+        $subcategory->save();
     }
 }

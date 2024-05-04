@@ -60,7 +60,9 @@ class SubCategoryController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $categories = $this->cateService->all();
+        $subcategory = $this->subCateService->find($id);
+        return view('admin.sub-category.edit', compact('subcategory', 'categories'));
     }
 
     /**
@@ -68,7 +70,15 @@ class SubCategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $data = $request->validate([
+            'category' => ['required'],
+            'name' => ['required', 'max:200', 'unique:sub_categories,name,' . $id],
+            'status' => ['required']
+        ]);
+        $this->subCateService->update($data, $id);
+
+        toastr('Updated Successfully!', 'success');
+        return redirect()->route('admin.sub-category.index');
     }
 
     /**
@@ -76,6 +86,14 @@ class SubCategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $this->subCateService->delete($id);
+        return response()->json(['status' => 'success', 'message' => 'Sub Category deleted successfully.']);
+    }
+
+    public function changeStatus(Request $request)
+    {
+        $data = $request->all();
+        $this->subCateService->changeStatus($data);
+        return response(['message' => 'Status has been updated!']);
     }
 }

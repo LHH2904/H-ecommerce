@@ -14,5 +14,5 @@ interface SubCateRepoInterface
     public function createSubCategory(array $data);
     public function updateSubCategory(array $data, string $id);
     public function deleteSubCategory(string $id);
-    // public function changStatus(array $data);
+    public function changStatus(array $data);
 }
