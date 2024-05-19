@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Repositories\SliderRepoInterface;
+use App\Repositories\Interfaces\SliderRepoInterface;
 use Illuminate\Http\Request;
 
 class SliderService

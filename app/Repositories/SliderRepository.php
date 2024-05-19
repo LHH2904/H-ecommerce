@@ -3,40 +3,49 @@
 namespace App\Repositories;
 
 use App\Models\Slider;
-use App\Repositories\SliderRepoInterface;
+use App\Repositories\Interfaces\SliderRepoInterface;
 use App\Traits\ImageUploadTrait;
 use Illuminate\Http\Request;
 
 class SliderRepository implements SliderRepoInterface
 {
     use ImageUploadTrait;
+
+    protected $model;
+
+    public function __construct(Slider $model)
+    {
+        $this->model = $model;
+    }
+
+
     public function getAllSliders()
     {
-        return Slider::where('status', 1)->orderBy('serial', 'asc')->get();
+        return $this->model->where('status', 1)->orderBy('serial', 'asc')->get();
     }
 
     public function getSliderById($id)
     {
-        return Slider::findOrFail($id);
+        return $this->model->findOrFail($id);
     }
 
-    public function createSlider(Request $request, array $data)
+    public function createSlider(Request $request, array $data): Slider
     {
-        $slider = new Slider();
-
         // Xử lý upload hình ảnh
-        $imagePath = $this->uploadImage($request, 'banner', 'uploads'); // Đường dẫn tới hình ảnh
+        $imagePath = $this->uploadImage($request, 'banner', 'uploads');
 
-        // Gán các dữ liệu còn lại
-        $slider->banner = $imagePath;
-        $slider->type = $data['type'];
-        $slider->title = $data['title'];
-        $slider->starting_price = $data['starting_price'] ?? null;
-        $slider->btn_url = $data['btn_url'] ?? null;
-        $slider->serial = $data['serial'];
-        $slider->status = $data['status'];
+        // Tạo và lưu trữ slider mới
+        $slider = $this->model::create([
+            'banner' => $imagePath,
+            'type' => $data['type'],
+            'title' => $data['title'],
+            'starting_price' => $data['starting_price'] ?? null,
+            'btn_url' => $data['btn_url'] ?? null,
+            'serial' => $data['serial'],
+            'status' => $data['status'],
+        ]);
 
-        $slider->save();
+        return $slider;
     }
 
     public function updateSlider(Request $request, array $data, string $id)
@@ -60,7 +69,7 @@ class SliderRepository implements SliderRepoInterface
 
     public function deleteSlider($id)
     {
-        $slider = Slider::findOrFail($id);
+        $slider = $this->getSliderById($id);
 
         $this->deleteImage($slider->banner);
 

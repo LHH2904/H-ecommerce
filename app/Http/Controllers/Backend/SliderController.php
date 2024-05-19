@@ -4,18 +4,19 @@ namespace App\Http\Controllers\Backend;
 
 use App\DataTables\SliderDataTable;
 use App\Http\Controllers\Controller;
-use App\Repositories\SliderRepoInterface;
-use App\Services\SliderService;
+use App\Http\Requests\SliderRequest;
+use App\Http\Requests\SliderUpdateRequest;
+use App\Repositories\Interfaces\SliderRepoInterface;
 use Illuminate\Http\Request;
 
 
 class SliderController extends Controller
 {
-    // private $sliderRepo;
+    private $sliderRepo;
 
-    public function __construct(protected SliderService $sliderService)
+    public function __construct(SliderRepoInterface $sliderRepo)
     {
-        // $this->sliderRepo = $sliderRepo;
+        $this->sliderRepo = $sliderRepo;
     }
     /**
      * Display a listing of the resource.
@@ -36,35 +37,16 @@ class SliderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(SliderRequest  $request)
     {
-        $data = $request->validate([
-            'banner' => ['required', 'max:2048', 'image'],
-            'type' => ['required', 'max:200'],
-            'title' => ['required', 'max:200'],
-            'starting_price' => ['max:200'],
-            'btn_url' => ['url'],
-            'serial' => ['required'],
-            'status' => ['required']
-        ]);
+        $data = $request->validated();
 
-        $this->sliderService->create($request, $data);
+        $this->sliderRepo->createSlider($request, $data);
 
         // toastr()->success('Password updated successfully!');
         toastr('Create Successfully!', 'success');
         return redirect()->route('admin.slider.index');
     }
-
-    //     try {
-    //         $this->sliderRepo->createSlider($request, $data);;
-    //         toastr('Create Successfully!', 'success');
-    //         return redirect()->back();
-    //     } catch (\Exception $e) {
-    //         // Xử lý lỗi khi không thể lưu trữ slider
-    //         toastr('Failed to create slider!', 'error');
-    //         return redirect()->back()->withInput();
-    //     }
-    // }
 
     /**
      * Display the specified resource.
@@ -79,26 +61,18 @@ class SliderController extends Controller
      */
     public function edit(string $id)
     {
-        $slider = $this->sliderService->find($id);
+        $slider =  $this->sliderRepo->getSliderById($id);
         return view('admin.slider.edit', compact('slider'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(SliderUpdateRequest $request, string $id)
     {
-        $data = $request->validate([
-            'banner' => ['nullable', 'max:2048', 'image'],
-            'type' => ['required', 'max:200'],
-            'title' => ['required', 'max:200'],
-            'starting_price' => ['max:200'],
-            'btn_url' => ['url'],
-            'serial' => ['required'],
-            'status' => ['required']
-        ]);
+        $data = $request->validated();
 
-        $this->sliderService->update($request, $data, $id);
+        $this->sliderRepo->updateSlider($request, $data, $id);
 
         toastr('Update Successfully!', 'success');
         return redirect()->route('admin.slider.index');
@@ -109,7 +83,9 @@ class SliderController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->sliderService->delete($id);
+        $this->sliderRepo->deleteSlider($id);
         return response()->json(['status' => 'success', 'message' => 'Slider deleted successfully.']);
     }
+
+    
 }

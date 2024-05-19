@@ -4,14 +4,22 @@ namespace App\Http\Controllers\Backend;
 
 use App\DataTables\SubCategoryDataTable;
 use App\Http\Controllers\Controller;
-use App\Services\CateService;
-use App\Services\SubCateService;
+use App\Repositories\Interfaces\CategoryRepoInterface;
+use App\Repositories\Interfaces\ChildCateRepoInterface;
+use App\Repositories\Interfaces\SubCateRepoInterface;
 use Illuminate\Http\Request;
 
 class SubCategoryController extends Controller
 {
-    public function __construct(protected SubCateService $subCateService, protected CateService $cateService)
+    private $subCateRepo;
+    private $cateRepo;
+    private $childCateRepo;
+
+    public function __construct(SubCateRepoInterface $subCateRepo, CategoryRepoInterface $cateRepo, ChildCateRepoInterface $childCateRepo)
     {
+        $this->subCateRepo = $subCateRepo;
+        $this->cateRepo = $cateRepo;
+        $this->childCateRepo = $childCateRepo;
     }
     /**
      * Display a listing of the resource.
@@ -26,7 +34,7 @@ class SubCategoryController extends Controller
      */
     public function create()
     {
-        $categories = $this->cateService->all();
+        $categories = $this->cateRepo->getAllCategories();
         return view('admin.sub-category.create', compact('categories'));
     }
 
@@ -40,7 +48,7 @@ class SubCategoryController extends Controller
             'name' => ['required', 'max:200', 'unique:sub_categories,name'],
             'status' => ['required']
         ]);
-        $this->subCateService->create($data);
+        $this->subCateRepo->createSubCategory($data);
 
         toastr('Created Successfully!', 'success');
         return redirect()->route('admin.sub-category.index');
@@ -59,8 +67,8 @@ class SubCategoryController extends Controller
      */
     public function edit(string $id)
     {
-        $categories = $this->cateService->all();
-        $subcategory = $this->subCateService->find($id);
+        $categories = $this->cateRepo->getAllCategories();
+        $subcategory = $this->subCateRepo->getSubCateById($id);
         return view('admin.sub-category.edit', compact('subcategory', 'categories'));
     }
 
@@ -74,7 +82,7 @@ class SubCategoryController extends Controller
             'name' => ['required', 'max:200', 'unique:sub_categories,name,' . $id],
             'status' => ['required']
         ]);
-        $this->subCateService->update($data, $id);
+        $this->subCateRepo->updateSubCategory($data, $id);
 
         toastr('Updated Successfully!', 'success');
         return redirect()->route('admin.sub-category.index');
@@ -85,14 +93,20 @@ class SubCategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->subCateService->delete($id);
+        $subCategory = $this->subCateRepo->getSubCateById($id);
+        $childCategory = $this->childCateRepo->countChildCategories($subCategory->id);
+        if ($childCategory > 0) {
+            return response()->json(['status' => 'error', 'message' => 'Vẫn còn danh mục con không thể xóa']);
+        }
+
+        $this->subCateRepo->deleteSubCategory($id);
         return response()->json(['status' => 'success', 'message' => 'Sub Category deleted successfully.']);
     }
 
     public function changeStatus(Request $request)
     {
         $data = $request->all();
-        $this->subCateService->changeStatus($data);
+        $this->subCateRepo->changeStatus($data);
         return response(['message' => 'Status has been updated!']);
     }
 }

@@ -4,15 +4,20 @@ namespace App\Http\Controllers\Backend;
 
 use App\DataTables\CategoryDataTable;
 use App\Http\Controllers\Controller;
-use App\Repositories\CategoryRepoInterface;
-use App\Services\CateService;
+use App\Http\Requests\CategoryRequest;
+use App\Repositories\Interfaces\CategoryRepoInterface;
+use App\Repositories\Interfaces\SubCateRepoInterface;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    private $cateRepo;
+    private $subCateRepo;
 
-    public function __construct(protected CateService $cateService)
+    public function __construct(CategoryRepoInterface $cateRepo, SubCateRepoInterface $subCateRepo)
     {
+        $this->cateRepo = $cateRepo;
+        $this->subCateRepo = $subCateRepo;
     }
     /**
      * Display a listing of the resource.
@@ -33,15 +38,11 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        $data = $request->validate([
-            'icon' => ['required', 'not_in:empty'],
-            'name' => ['required', 'max:200', 'unique:categories,name'],
-            'status' => ['required']
-        ]);
+        $data = $request->validate();
 
-        $this->cateService->create($data);
+        $this->cateRepo->createCategory($data);
 
         toastr('Create Successfully!', 'success');
         return redirect()->route('admin.category.index');
@@ -60,7 +61,7 @@ class CategoryController extends Controller
      */
     public function edit(string $id)
     {
-        $category = $this->cateService->find($id);
+        $category = $this->cateRepo->getCateById($id);
         return view('admin.category.edit', compact('category'));
     }
 
@@ -75,7 +76,7 @@ class CategoryController extends Controller
             'status' => ['required']
         ]);
 
-        $this->cateService->update($data, $id);
+        $this->cateRepo->updateCategory($data, $id);
 
         toastr('Update Successfully!', 'success');
         return redirect()->route('admin.category.index');
@@ -86,14 +87,19 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->cateService->delete($id);
+        $category = $this->cateRepo->getCateById($id);
+        $subCategory = $this->subCateRepo->countSubCategories($category->id);
+        if ($subCategory > 0) {
+            return response()->json(['status' => 'error', 'message' => 'Vẫn còn danh mục con không thể xóa']);
+        }
+        $this->cateRepo->deleteCategory($id);
         return response()->json(['status' => 'success', 'message' => 'Category deleted successfully.']);
     }
 
     public function changeStatus(Request $request)
     {
         $data = $request->all();
-        $this->cateService->changeStatus($data);
+        $this->cateRepo->changeStatus($data);
         return response(['message' => 'Status has been updated!']);
     }
 }

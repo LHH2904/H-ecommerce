@@ -1,11 +1,6 @@
 <?php
 
-namespace App\Repositories;
-
-use Illuminate\Database\Eloquent\Model as Model;
-use Illuminate\Http\Request;
-use DB;
-use Config;
+namespace App\Repositories\Interfaces;
 
 interface SubCateRepoInterface
 {
@@ -14,5 +9,8 @@ interface SubCateRepoInterface
     public function createSubCategory(array $data);
     public function updateSubCategory(array $data, string $id);
     public function deleteSubCategory(string $id);
-    public function changStatus(array $data);
+    public function changeStatus(array $data);
+    public function getSubCategoriesByCategoryId(string $categoryId);
+    public function getSubCategoriesByChildCategoryId(string $categoryId);
+    public function countSubCategories($categoryId);
 }

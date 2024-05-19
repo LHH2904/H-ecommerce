@@ -3,19 +3,25 @@
 namespace App\Repositories;
 
 use App\Models\Category;
-use App\Repositories\CategoryRepoInterface;
+use App\Repositories\Interfaces\CategoryRepoInterface;
 use Illuminate\Support\Str;
 
 class CategoryRepository implements CategoryRepoInterface
 {
+    protected $model;
+
+    public function __construct(Category $model)
+    {
+        $this->model = $model;
+    }
     public function getAllCategories()
     {
-        return Category::all();
+        return $this->model->all();
     }
 
     public function getCateById($id)
     {
-        return Category::findOrFail($id);
+        return $this->model->findOrFail($id);
     }
 
     public function createCategory(array $data)
@@ -44,7 +50,7 @@ class CategoryRepository implements CategoryRepoInterface
         $category->delete();
     }
 
-    public function changStatus(array $data)
+    public function changeStatus(array $data)
     {
         $category = $this->getCateById($data['id']);
         $category->status = $data['status'] == 'true' ? 1 : 0;

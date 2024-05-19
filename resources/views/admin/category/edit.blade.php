@@ -19,6 +19,7 @@
                             <form action="{{ route('admin.category.update', $category->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
+                                <input type="hidden" name="categoryId" value="{{ $category->id }}">
                                 <div class="form-group">
                                     <label for="">Icon</label>
                                     <div>

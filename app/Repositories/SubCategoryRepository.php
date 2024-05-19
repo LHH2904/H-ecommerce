@@ -3,19 +3,25 @@
 namespace App\Repositories;
 
 use App\Models\SubCategory;
-use Illuminate\Http\Request;
+use App\Repositories\Interfaces\SubCateRepoInterface;
 use Illuminate\Support\Str;
 
 class SubCategoryRepository implements SubCateRepoInterface
 {
+    protected $model;
+
+    public function __construct(SubCategory $model)
+    {
+        $this->model = $model;
+    }
     public function getAllSubCategories()
     {
-        return SubCategory::all();
+        return $this->model->all();
     }
 
     public function getSubCateById(string $id)
     {
-        return SubCategory::findOrFail($id);
+        return  $this->model->findOrFail($id);
     }
 
     public function createSubCategory(array $data)
@@ -42,14 +48,29 @@ class SubCategoryRepository implements SubCateRepoInterface
 
     public function deleteSubCategory($id)
     {
-        $subcategory = SubCategory::findOrFail($id);
+        $subcategory = $this->getSubCateById($id);
         $subcategory->delete();
     }
 
-    public function changStatus($data)
+    public function changeStatus($data)
     {
-        $subcategory = SubCategory::findOrFail($data['id']);
+        $subcategory = $this->model->findOrFail($data['id']);
         $subcategory->status = $data['status'] == 'true' ? 1 : 0;
         $subcategory->save();
+    }
+
+    public function getSubCategoriesByCategoryId($categoryId)
+    {
+        return $this->model->where('category_id', $categoryId)->where('status', 1)->get();
+    }
+
+    public function getSubCategoriesByChildCategoryId($categoryId)
+    {
+        return $this->model->where('category_id', $categoryId)->get();
+    }
+
+    public function countSubCategories($categoryId)
+    {
+        return $this->model->where('category_id', $categoryId)->count();
     }
 }

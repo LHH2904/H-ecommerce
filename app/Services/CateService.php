@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Repositories\CategoryRepoInterface;
+use App\Repositories\Interfaces\CategoryRepoInterface;
 
 class CateService
 {

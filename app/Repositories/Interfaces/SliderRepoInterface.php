@@ -1,11 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Interfaces;
 
-use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Http\Request;
-use DB;
-use Config;
 
 interface SliderRepoInterface
 {

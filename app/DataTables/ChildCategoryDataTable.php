@@ -22,7 +22,39 @@ class ChildCategoryDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', 'childcategory.action')
+            ->addColumn('action', function ($query) {
+                $editBtn = "<a href='" . route('admin.child-category.edit', $query->id) . "' class='btn btn-primary'><i class='fa-regular fa-pen-to-square'></i></a>";
+                $delBtn = "<a href='" . route('admin.child-category.destroy', $query->id) . "' class='btn btn-danger ml-2 delete-item'><i class='fa-regular fa-trash-can'></i></a>";
+                return $editBtn . $delBtn;
+            })
+            ->addColumn('category', function ($query) {
+                return $query->category->name;
+            })
+            ->addColumn('sub_category', function ($query) {
+                return $query->subCategory->name;
+            })
+            ->addColumn('status', function ($query) {
+                if ($query->status == 1) {
+                    $button = '<label class="custom-switch mt-2">
+                        <input type="checkbox" checked name="custom-switch-checkbox"
+                        data-id="' . $query->id . '"
+                        class="custom-switch-input change-status">
+                        <span class="custom-switch-indicator"></span>
+                    </label>';
+                } else {
+                    $button = '<label class="custom-switch mt-2">
+                        <input type="checkbox" name="custom-switch-checkbox"
+                        data-id="' . $query->id . '"
+                        class="custom-switch-input change-status">
+                        <span class="custom-switch-indicator"></span>
+                    </label>';
+                }
+                return $button;
+            })
+            ->addColumn('category', function ($query) {
+                return $query->category->name;
+            })
+            ->rawColumns(['action', 'status'])
             ->setRowId('id');
     }
 
@@ -40,20 +72,20 @@ class ChildCategoryDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('childcategory-table')
-                    ->columns($this->getColumns())
-                    ->minifiedAjax()
-                    //->dom('Bfrtip')
-                    ->orderBy(1)
-                    ->selectStyleSingle()
-                    ->buttons([
-                        Button::make('excel'),
-                        Button::make('csv'),
-                        Button::make('pdf'),
-                        Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload')
-                    ]);
+            ->setTableId('childcategory-table')
+            ->columns($this->getColumns())
+            ->minifiedAjax()
+            //->dom('Bfrtip')
+            ->orderBy(1)
+            ->selectStyleSingle()
+            ->buttons([
+                Button::make('excel'),
+                Button::make('csv'),
+                Button::make('pdf'),
+                Button::make('print'),
+                Button::make('reset'),
+                Button::make('reload')
+            ]);
     }
 
     /**
@@ -62,15 +94,16 @@ class ChildCategoryDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::computed('action')
-                  ->exportable(false)
-                  ->printable(false)
-                  ->width(60)
-                  ->addClass('text-center'),
             Column::make('id'),
-            Column::make('add your columns'),
-            Column::make('created_at'),
-            Column::make('updated_at'),
+            Column::make('name'),
+            Column::make('category'),
+            Column::make('sub_category'),
+            Column::make('status'),
+            Column::computed('action')
+                ->exportable(false)
+                ->printable(false)
+                ->width(200)
+                ->addClass('text-center'),
         ];
     }
 
