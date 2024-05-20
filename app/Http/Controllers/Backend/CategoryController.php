@@ -38,9 +38,13 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CategoryRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->validate();
+        $data = $request->validate([
+            'icon' => ['required', 'not_in:empty'],
+            'name' => ['required', 'max:200', 'unique:categories,name'],
+            'status' => ['required']
+        ]);
 
         $this->cateRepo->createCategory($data);
 
