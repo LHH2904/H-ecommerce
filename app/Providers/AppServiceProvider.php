@@ -5,11 +5,13 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\ProfileRepository;
 use App\Repositories\BaseRepository;
+use App\Repositories\BrandRepository;
 use App\Repositories\Interfaces\SliderRepoInterface;
 use App\Repositories\Interfaces\SubCateRepoInterface;
 use App\Repositories\Interfaces\CategoryRepoInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ChildCategoryRepository;
+use App\Repositories\Interfaces\BrandRepoInterface;
 use App\Repositories\Interfaces\ChildCateRepoInterface;
 use App\Repositories\SliderRepository;
 use App\Repositories\SubCategoryRepository;
@@ -35,6 +37,9 @@ class AppServiceProvider extends ServiceProvider
 
         // ChildCate repository
         $this->app->bind(ChildCateRepoInterface::class, ChildCategoryRepository::class);
+
+        // ChildCate repository
+        $this->app->bind(BrandRepoInterface::class, BrandRepository::class);
     }
 
     /**

@@ -46,8 +46,7 @@ class CategoryRepository implements CategoryRepoInterface
 
     public function deleteCategory($id)
     {
-        $category = $this->getCateById($id);
-        $category->delete();
+        $this->getCateById($id)->delete();
     }
 
     public function changeStatus(array $data)
